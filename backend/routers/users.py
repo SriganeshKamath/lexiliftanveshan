@@ -50,7 +50,13 @@ async def list_users():
 
 @router.get("/{user_id}", response_model=UserInDB)
 async def get_user(user_id: str):
-    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    """Fetch one user by ID"""
+    try:
+        obj_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+
+    user = await db.users.find_one({"_id": obj_id})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     user["_id"] = str(user["_id"])
