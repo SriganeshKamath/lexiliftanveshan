@@ -1,0 +1,22 @@
+/* -----------------------------
+   Tailwind Layers (MUST be first)
+------------------------------ */
+@import "tailwindcss";
+
+/* -----------------------------
+   Font Imports
+------------------------------ */
+@import "@fontsource/lexend/400.css";
+@import "@fontsource/lexend/600.css";
+@import "@fontsource/atkinson-hyperlegible/400.css";
+@import "@fontsource/atkinson-hyperlegible/700.css";
+
+/* -----------------------------
+   Global Styling
+------------------------------ */
+body {
+  font-family: "Lexend", "Atkinson Hyperlegible", sans-serif;
+  background-color: #f6f0ff;
+  margin: 0;
+  padding: 0;
+}
