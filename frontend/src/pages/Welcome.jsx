@@ -59,9 +59,13 @@ export default function Welcome() {
       pointerY.set(ny);
     };
     node.addEventListener("mousemove", onMove);
-    node.addEventListener("touchmove", (ev) => {
-      if (ev.touches && ev.touches[0]) onMove(ev.touches[0]);
-    }, { passive: true });
+    node.addEventListener(
+      "touchmove",
+      (ev) => {
+        if (ev.touches && ev.touches[0]) onMove(ev.touches[0]);
+      },
+      { passive: true }
+    );
     return () => {
       node.removeEventListener("mousemove", onMove);
     };
@@ -117,9 +121,23 @@ export default function Welcome() {
           </defs>
 
           {/* soft green-blue cloud */}
-          <ellipse cx="200" cy="150" rx="260" ry="130" fill="url(#g1)" filter="url(#blur1)" />
+          <ellipse
+            cx="200"
+            cy="150"
+            rx="260"
+            ry="130"
+            fill="url(#g1)"
+            filter="url(#blur1)"
+          />
           {/* second faint cloud */}
-          <ellipse cx="600" cy="300" rx="300" ry="160" fill="url(#g2)" filter="url(#blur1)" />
+          <ellipse
+            cx="600"
+            cy="300"
+            rx="300"
+            ry="160"
+            fill="url(#g2)"
+            filter="url(#blur1)"
+          />
         </svg>
       </div>
 
@@ -156,7 +174,10 @@ export default function Welcome() {
       >
         <g opacity="0.03" stroke="#ffffff" strokeWidth="1" fill="none">
           <path d="M120 200 L240 180 L320 240 L420 220" strokeLinecap="round" />
-          <path d="M800 100 L880 140 L940 110 L1020 150" strokeLinecap="round" />
+          <path
+            d="M800 100 L880 140 L940 110 L1020 150"
+            strokeLinecap="round"
+          />
         </g>
       </svg>
 
@@ -172,22 +193,152 @@ export default function Welcome() {
           }}
           className="w-full max-w-2xl mx-auto"
         >
-          <div className="mx-auto w-fit mb-6">
-            {/* Logo simple: circular ring, no face */}
-            <svg width="92" height="92" viewBox="0 0 120 120" className="mx-auto">
-              <defs>
-                <radialGradient id="lg" cx="30%" cy="30%">
-                  <stop offset="0%" stopColor="#9fffd7" stopOpacity="0.95" />
-                  <stop offset="100%" stopColor="#6ecbff" stopOpacity="0.12" />
-                </radialGradient>
-              </defs>
-              <circle cx="60" cy="60" r="44" fill="url(#lg)" opacity="0.92" />
-              <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.06)" strokeWidth="6" fill="transparent" />
-              <circle cx="60" cy="60" r="16" fill="rgba(255,255,255,0.06)" />
-            </svg>
+          {/* === FLOATING ASTRONAUT (UPGRADED) === */}
+          <div className="mx-auto w-fit relative h-40 sm:h-48">
+            {/* Pink smoke trail */}
+            <motion.div
+              className="absolute left-1/2 top-[70%] -translate-x-1/2 z-0"
+              animate={{ opacity: [0.15, 0.35, 0.15], y: [0, -6, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                width: "90px",
+                height: "40px",
+                background:
+                  "radial-gradient(circle, rgba(255,180,220,0.25), rgba(255,180,220,0))",
+                filter: "blur(14px)",
+              }}
+            />
+
+            <motion.div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+              animate={{
+                y: [0, -14, 0],
+                rotate: [-4, 3, -4],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              {/* Astronaut SVG (bigger + more alive) */}
+              <svg width="150" height="150" viewBox="0 0 200 200">
+                {/* Helmet glow */}
+                <circle cx="100" cy="70" r="48" fill="rgba(255,255,255,0.10)" />
+
+                {/* Helmet */}
+                <circle
+                  cx="100"
+                  cy="70"
+                  r="36"
+                  fill="rgba(255,255,255,0.13)"
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="5"
+                />
+
+                {/* Body (slight tilt) */}
+                <motion.rect
+                  x="70"
+                  y="105"
+                  width="60"
+                  height="70"
+                  rx="18"
+                  fill="rgba(255,255,255,0.13)"
+                  stroke="rgba(255,255,255,0.22)"
+                  strokeWidth="4"
+                  animate={{
+                    rotate: [-3, 2, -3],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                {/* Arms (gentle waving) */}
+                <motion.rect
+                  x="40"
+                  y="115"
+                  width="32"
+                  height="18"
+                  rx="10"
+                  fill="rgba(255,255,255,0.12)"
+                  animate={{ rotate: [-8, -2, -8] }}
+                  transition={{
+                    duration: 3.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  transform="translate(0 -4)"
+                />
+                <motion.rect
+                  x="128"
+                  y="115"
+                  width="32"
+                  height="18"
+                  rx="10"
+                  fill="rgba(255,255,255,0.12)"
+                  animate={{ rotate: [8, 2, 8] }}
+                  transition={{
+                    duration: 3.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  transform="translate(0 -4)"
+                />
+
+                {/* Legs */}
+                <rect
+                  x="78"
+                  y="168"
+                  width="22"
+                  height="34"
+                  rx="10"
+                  fill="rgba(255,255,255,0.13)"
+                />
+                <rect
+                  x="100"
+                  y="168"
+                  width="22"
+                  height="34"
+                  rx="10"
+                  fill="rgba(255,255,255,0.13)"
+                />
+
+                {/* Backpack */}
+                <rect
+                  x="65"
+                  y="108"
+                  width="70"
+                  height="32"
+                  rx="10"
+                  fill="rgba(255,255,255,0.05)"
+                />
+
+                {/* Jetpack glow */}
+                <ellipse
+                  cx="100"
+                  cy="205"
+                  rx="28"
+                  ry="10"
+                  fill="rgba(255,180,220,0.22)"
+                  style={{ filter: "blur(10px)" }}
+                />
+              </svg>
+            </motion.div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-xl">
+          {/* === UPGRADED LEXILIFT HEADING === */}
+          <h1
+            className="text-6xl sm:text-7xl md:text-8xl font-extrabold leading-tight text-white drop-shadow-[0_0_22px_rgba(255,255,255,0.45)]"
+            style={{
+              fontStyle: "italic",
+              letterSpacing: "0.75px",
+              textShadow:
+                "0px 0px 18px rgba(255,255,255,0.45), 0px 0px 30px rgba(0,200,255,0.25)",
+            }}
+          >
             LexiLift
           </h1>
 
@@ -226,8 +377,6 @@ export default function Welcome() {
           >
             Tap to Begin!
           </motion.button>
-
-          
         </div>
       </div>
 
@@ -257,10 +406,32 @@ export default function Welcome() {
 
           <g transform="translate(60,60)">
             {/* Big planet circle (cropped by view to appear curved) */}
-            <circle cx="320" cy="320" r="240" fill="url(#planetGrad)" filter="url(#pglow)" />
+            <circle
+              cx="320"
+              cy="320"
+              r="240"
+              fill="url(#planetGrad)"
+              filter="url(#pglow)"
+            />
             {/* subtle rings */}
-            <ellipse cx="220" cy="300" rx="190" ry="48" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="8" />
-            <ellipse cx="220" cy="320" rx="160" ry="36" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="6" />
+            <ellipse
+              cx="220"
+              cy="300"
+              rx="190"
+              ry="48"
+              fill="none"
+              stroke="rgba(255,255,255,0.04)"
+              strokeWidth="8"
+            />
+            <ellipse
+              cx="220"
+              cy="320"
+              rx="160"
+              ry="36"
+              fill="none"
+              stroke="rgba(255,255,255,0.03)"
+              strokeWidth="6"
+            />
           </g>
         </svg>
       </div>
