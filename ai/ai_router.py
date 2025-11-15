@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware 
 from .asr.asr_service import transcribe_file, analyze
 from .tts.tts_service import synthesize_to_wav
 from .llm.llm_service import (
@@ -14,6 +15,23 @@ import os
 import json
 
 app = FastAPI(title="LexiLift AI (dev)")
+
+# ⭐ ADD CORS HERE
+origins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5173",
+    "*",   # DEV ONLY (remove later for security)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- 1️⃣ ASR Evaluation ---
 @app.post("/asr/evaluate")

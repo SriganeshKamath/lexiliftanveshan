@@ -3,6 +3,7 @@ import Welcome from "./pages/Welcome";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
+import Lesson from "./pages/lesson";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
    
 
+        <Route path="/lesson" element={<Lesson />} />
 
       </Routes>
     </BrowserRouter>

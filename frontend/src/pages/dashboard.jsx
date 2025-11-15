@@ -292,13 +292,7 @@ export default function Dashboard() {
               icon="🧩"
             />
 
-            <DashboardCard
-              title="Achievements & Rewards"
-              subtitle="See your stars, streaks, and reading milestones."
-              onClick={() => (window.location.href = "/achievements")}
-              gradient="from-amber-400/20 via-pink-400/10 to-transparent"
-              icon="🏆"
-            />
+            
           </div>
         </div>
 
