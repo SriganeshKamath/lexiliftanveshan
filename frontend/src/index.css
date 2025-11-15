@@ -20,3 +20,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.settings-card:hover {
+  box-shadow: 0 0 14px rgba(255,255,255,0.12);
+}
