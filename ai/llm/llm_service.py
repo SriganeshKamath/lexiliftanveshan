@@ -212,3 +212,32 @@ def generate_phoneme_lesson(phoneme: str, difficulty: int = 1):
             "phoneme_color_hints": [f"{phoneme}:#4F46E5"]
         }
     return lesson
+
+def generate_pronunciation_mission(level: int = 1):
+    prompt = f"""
+    Create ONE short pronunciation mission sentence for a young learner.
+    Level {level} difficulty rules:
+    - Level 1: simple 3–5 word sentence, basic phonemes
+    - Level 2: 5–7 word sentence with blends
+    - Level 3: 7–10 word sentence, complex sounds
+
+    Return JSON ONLY:
+    {{
+      "mission_title": "Galactic Echo Quest",
+      "sentence": "The moon glows softly.",
+      "target_phonemes": ["m", "s"],
+      "difficulty": {level}
+    }}
+    """
+
+    raw = _generate(prompt)
+    data = _parse_json_output(raw)
+    if not data:
+        data = {
+            "mission_title": "Fallback Mission",
+            "sentence": "The sun is bright.",
+            "target_phonemes": ["s", "b"],
+            "difficulty": level
+        }
+    return data
+

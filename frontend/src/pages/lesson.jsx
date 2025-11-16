@@ -159,13 +159,6 @@ export default function Lesson() {
     fetchLesson(value, difficulty);
   }
 
-  // Update difficulty
-  function handleDifficultyChange(e) {
-    const level = Number(e.target.value);
-    setDifficulty(level);
-    fetchLesson(phoneme, level);
-  }
-
   return (
     <div
       className="min-h-screen w-full relative overflow-hidden text-white font-lexend px-5 py-6"
@@ -186,7 +179,7 @@ export default function Lesson() {
       </button>
 
       {/* Top controls: Phoneme selector + difficulty */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
         <motion.h1
           className="text-3xl sm:text-4xl md:text-5xl font-extrabold drop-shadow-lg"
           style={{ fontStyle: "italic" }}
@@ -196,21 +189,30 @@ export default function Lesson() {
           Phoneme Lesson
         </motion.h1>
 
-        <div className="flex flex-wrap gap-3 items-center justify-end">
-          <div className="flex items-center gap-2">
-            <span className="text-sm sm:text-base text-white/80">Sound:</span>
-            <select
-              value={phoneme}
-              onChange={handlePhonemeChange}
-              className="bg-black/40 border border-white/20 rounded-full px-1 py-1 text-sm sm:text-base outline-none"
-            >
-              {PHONEME_OPTIONS.map((p) => (
-                <option key={p} value={p}>
-                  /{p}/
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Wrap dropdown + label tighter */}
+        <div className="flex items-center gap-2 sm:ml-4">
+          <span className="text-sm sm:text-base text-white/80">Sound:</span>
+
+          <select
+            value={phoneme}
+            onChange={handlePhonemeChange}
+            className="
+        bg-black/60 
+        backdrop-blur-md
+        border border-white/20 
+        rounded-lg 
+        px-3 py-2 
+        text-sm sm:text-base 
+        outline-none
+        text-white
+      "
+          >
+            {PHONEME_OPTIONS.map((p) => (
+              <option key={p} value={p} className="text-white bg-black/80">
+                /{p}/
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

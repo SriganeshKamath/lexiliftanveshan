@@ -8,6 +8,7 @@ from .llm.llm_service import (
     generate_microdrills,
     generate_phoneme_lesson,
     generate_saarthi_feedback,  # ✅ NEW import
+    generate_pronunciation_mission,
 )
 from .ai_utils import save_upload_file
 import uvicorn
@@ -81,6 +82,21 @@ async def llm_feedback(accuracy: float = Form(...)):
     """
     feedback = generate_saarthi_feedback(accuracy)
     return JSONResponse({"feedback": feedback})
+
+
+# --- 7️⃣ Generate Pronunciation Mission ---
+@app.post("/llm/generate_mission")
+async def llm_generate_mission(level: int = Form(1)):
+    """
+    Creates a pronunciation mission:
+    - mission title
+    - one short sentence
+    - target phonemes 
+    """
+
+    mission = generate_pronunciation_mission(level)
+    return JSONResponse({"mission": mission})
+
 
 if __name__ == "__main__":
     uvicorn.run("ai.ai_router:app", host="0.0.0.0", port=8001, reload=True)

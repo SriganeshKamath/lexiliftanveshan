@@ -1,14 +1,61 @@
+// src/pages/Dashboard.jsx
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
 export default function Dashboard() {
-  // ------------------------------
-  // 🔹 User state (dynamic)
-  // ------------------------------
-  const [userName, setUserName] = useState("Explorer");
-  const [userLevel, setUserLevel] = useState(1);
+  // Placeholder user info – later wire from backend
+  const userName = "Explorer";
+  const userLevel = 1;
   const [streakDays, setStreakDays] = useState(0);
   const [starsEarned, setStarsEarned] = useState(0);
+  const [burst, setBurst] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("stars");
+
+    if (saved === null) {
+      // first time: start at 0
+      localStorage.setItem("stars", 0);
+      setStarsEarned(0);
+    } else {
+      setStarsEarned(Number(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem("lastVisit");
+    const streak = Number(localStorage.getItem("streak") || 0);
+
+    if (!lastVisit) {
+      // First ever visit
+      localStorage.setItem("lastVisit", today);
+      localStorage.setItem("streak", 1);
+      setStreakDays(1);
+    } else {
+      if (lastVisit === today) {
+        // User already visited today → keep streak same
+        setStreakDays(streak);
+      } else {
+        // Check if yesterday
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+        if (lastVisit === yesterday) {
+          // ✔ Continued streak
+          const newStreak = streak + 1;
+          localStorage.setItem("streak", newStreak);
+          setStreakDays(newStreak);
+        } else {
+          // ❌ Missed one or more days → reset
+          localStorage.setItem("streak", 1);
+          setStreakDays(1);
+        }
+
+        // Update last visit
+        localStorage.setItem("lastVisit", today);
+      }
+    }
+  }, []);
 
   const [saarthiIndex, setSaarthiIndex] = useState(0);
   const [stars, setStars] = useState([]);
@@ -16,29 +63,6 @@ export default function Dashboard() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const audioRef = useRef(null);
 
-  // -----------------------------------------
-  // 🔹 Load user from localStorage
-  // -----------------------------------------
-  useEffect(() => {
-    const raw = localStorage.getItem("lexilift_user");
-
-    if (!raw) return;
-
-    try {
-      const user = JSON.parse(raw);
-
-      setUserName(user.name || "Explorer");
-      setUserLevel(user.level || 1);
-
-      // optional future fields
-      setStreakDays(user.streak || 0);
-      setStarsEarned(user.stars || 0);
-    } catch (err) {
-      console.log("Error loading user:", err);
-    }
-  }, []);
-
-  // Saarthi rotating feedback messages
   const saarthiMessages = [
     "You did awesome yesterday, ready to fly again? 🚀",
     "Even tricky words get easier each time. I’m proud of you 💛",
@@ -46,6 +70,7 @@ export default function Dashboard() {
     "You’re not alone — I’m here cheering for every word ⭐",
   ];
 
+  // rotating feedback messages
   useEffect(() => {
     const id = setInterval(
       () => setSaarthiIndex((i) => (i + 1) % saarthiMessages.length),
@@ -54,7 +79,7 @@ export default function Dashboard() {
     return () => clearInterval(id);
   }, []);
 
-  // Background star field
+  // generate star field
   useEffect(() => {
     const arr = Array.from({ length: 30 }).map(() => ({
       left: Math.random() * 100,
@@ -67,21 +92,25 @@ export default function Dashboard() {
     setStars(arr);
   }, []);
 
+  // background music toggle handler
   const handleMusicToggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
-
     if (!musicOn) {
       audio
         .play()
         .then(() => setMusicOn(true))
-        .catch(() => setMusicOn(false));
+        .catch(() => {
+          // autoplay blocked – user must tap again after some interaction
+          setMusicOn(false);
+        });
     } else {
       audio.pause();
       setMusicOn(false);
     }
   };
 
+  // star animation variants
   const starMotion = (s) => ({
     initial: { opacity: 0, scale: 0.6 },
     animate: {
@@ -106,8 +135,13 @@ export default function Dashboard() {
           "linear-gradient(180deg, rgba(5,11,20,0.9) 0%, rgba(6,22,40,0.96) 35%, rgba(3,10,22,1) 100%)",
       }}
     >
-      {/* Background audio */}
-      <audio ref={audioRef} src="/audio/ambient-space.mp3" loop preload="auto" />
+      {/* Background audio – add your own file to public/audio/ambient.mp3 */}
+      <audio
+        ref={audioRef}
+        src="/audio/ambient-space.mpeg"
+        loop
+        preload="auto"
+      />
 
       {/* Stars */}
       {stars.map((s, i) => (
@@ -128,9 +162,68 @@ export default function Dashboard() {
         />
       ))}
 
-      {/* Main Content */}
+      {/* Subtle constellation lines */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 1440 800"
+        preserveAspectRatio="none"
+      >
+        <g opacity="0.03" stroke="#ffffff" strokeWidth="1" fill="none">
+          <path d="M140 220 L260 180 L360 230" strokeLinecap="round" />
+          <path
+            d="M860 140 L940 160 L1040 130 L1140 170"
+            strokeLinecap="round"
+          />
+        </g>
+      </svg>
+
+      {/* Planet bottom-right */}
+      <div className="pointer-events-none absolute right-0 bottom-0 z-0">
+        <svg
+          width="520"
+          height="520"
+          viewBox="0 0 520 520"
+          className="w-[52vw] sm:w-[38vw] md:w-[30vw] lg:w-[24vw]"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <radialGradient id="dashPlanet" cx="30%" cy="30%">
+              <stop offset="0%" stopColor="#a6fff0" stopOpacity="0.9" />
+              <stop offset="45%" stopColor="#69d2ff" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#111827" stopOpacity="1" />
+            </radialGradient>
+            <filter id="dashGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="22" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <g transform="translate(60,60)">
+            <circle
+              cx="320"
+              cy="320"
+              r="240"
+              fill="url(#dashPlanet)"
+              filter="url(#dashGlow)"
+            />
+            <ellipse
+              cx="230"
+              cy="315"
+              rx="190"
+              ry="44"
+              fill="none"
+              stroke="rgba(255,255,255,0.04)"
+              strokeWidth="8"
+            />
+          </g>
+        </svg>
+      </div>
+
+      {/* MAIN CONTENT */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col gap-8">
-        {/* Greeting Section */}
+        {/* Top bar: greeting + music toggle */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <motion.p
@@ -141,10 +234,12 @@ export default function Dashboard() {
               Welcome back,{" "}
               <span className="font-semibold text-slate-50">{userName}</span>!
             </motion.p>
-
             <motion.h1
               className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-1 drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]"
-              style={{ fontStyle: "italic", letterSpacing: "0.7px" }}
+              style={{
+                fontStyle: "italic",
+                letterSpacing: "0.7px",
+              }}
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -152,8 +247,8 @@ export default function Dashboard() {
             </motion.h1>
           </div>
 
-          {/* Music + Settings */}
           <div className="flex flex-row gap-2">
+            {/* Music toggle */}
             <motion.button
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.03 }}
@@ -166,6 +261,7 @@ export default function Dashboard() {
               <span>{musicOn ? "Pause calm music" : "Play calm music"}</span>
             </motion.button>
 
+            {/* Settings Button */}
             <motion.button
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.03 }}
@@ -178,7 +274,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Row */}
+        {/* Stats row */}
         <motion.div
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
           initial={{ opacity: 0, y: 10 }}
@@ -195,11 +291,30 @@ export default function Dashboard() {
             value={`${streakDays} days`}
             accent="from-sky-400/80 to-cyan-500/80"
           />
-          <StatCard
-            label="Stars Collected"
-            value={starsEarned}
-            accent="from-yellow-400/80 to-amber-500/80"
-          />
+
+          <div className="relative">
+            <StatCard
+              label="Stars Collected"
+              value={starsEarned}
+              accent="from-yellow-400/80 to-amber-500/80"
+            />
+            {burst && (
+              <motion.div
+                className="absolute"
+                style={{
+                  top: "-10px",
+                  right: "-10px",
+                  pointerEvents: "none",
+                }}
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{ scale: 2, opacity: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+              >
+                ⭐
+              </motion.div>
+            )}
+          </div>
+
           <StatCard
             label="Today’s Focus"
             value="Practice & Pronounce"
@@ -207,9 +322,9 @@ export default function Dashboard() {
           />
         </motion.div>
 
-        {/* 🚀 Main Actions */}
+        {/* Main grid of actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mt-2">
-          {/* Left */}
+          {/* Left column – main actions */}
           <div className="flex flex-col gap-4">
             <DashboardCard
               title="Start Phoneme Lesson"
@@ -219,27 +334,30 @@ export default function Dashboard() {
               gradient="from-green-400/20 via-emerald-400/10 to-transparent"
               icon="🔤"
             />
-
             <DashboardCard
-              title="Practice Reading"
+              title="Practice Exercise"
               subtitle="Words and sentences picked just for your level."
-              onClick={() => (window.location.href = "/exercise")}
+              onClick={() => {
+                const current = Number(localStorage.getItem("stars") || 0);
+                const updated = current + 1;
+
+                localStorage.setItem("stars", updated);
+                setStarsEarned(updated); // ensure UI updates immediately
+
+                setBurst(true);
+                setTimeout(() => setBurst(false), 600);
+                setTimeout(() => {
+                  window.location.href = "/practice-exercise";
+                }, 300); // small delay ensures save completes
+              }}
               gradient="from-sky-400/20 via-indigo-400/10 to-transparent"
               icon="📖"
             />
-
-            <DashboardCard
-              title="Pronunciation Mission"
-              subtitle="Read aloud and let LexiLift listen and guide you."
-              onClick={() => (window.location.href = "/pronunciation")}
-              gradient="from-purple-400/20 via-fuchsia-400/10 to-transparent"
-              icon="🎙️"
-            />
           </div>
 
-          {/* Right */}
+          {/* Right column – Saarthi + microdrills + achievements */}
           <div className="flex flex-col gap-4">
-            {/* Saarthi Card */}
+            {/* Saarthi feedback mascot */}
             <motion.div
               className="relative overflow-hidden rounded-3xl bg-black/30 border border-white/10 backdrop-blur-md p-4 sm:p-5 shadow-xl min-h-[180px]"
               initial={{ opacity: 0, x: 20 }}
@@ -247,7 +365,7 @@ export default function Dashboard() {
               transition={{ delay: 0.25 }}
             >
               <div className="flex items-start gap-3 sm:gap-4">
-                {/* Mascot */}
+                {/* Saarthi mascot – glowing star buddy */}
                 <motion.div
                   className="relative w-16 h-16 sm:w-20 sm:h-20"
                   animate={{ y: [0, -6, 0], rotate: [-4, 4, -4] }}
@@ -258,13 +376,29 @@ export default function Dashboard() {
                   }}
                 >
                   <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 rounded-full"
                     style={{
                       background:
                         "radial-gradient(circle at 30% 30%, #ffffff, #ffe6a7, rgba(255,255,255,0))",
                       boxShadow: "0 0 18px rgba(255,255,255,0.9)",
                     }}
                   />
+                  <div className="absolute inset-1 rounded-full border border-white/60" />
+                  {/* little orbiting dot */}
+                  <motion.div
+                    className="absolute left-1/2 top-1/2 w-20 h-20 -translate-x-1/2 -translate-y-1/2"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <div
+                      className="absolute w-2.5 h-2.5 rounded-full bg-white"
+                      style={{ top: "4px", left: "50%" }}
+                    />
+                  </motion.div>
                 </motion.div>
 
                 <div className="flex-1 text-left">
@@ -280,10 +414,15 @@ export default function Dashboard() {
                   >
                     {saarthiMessages[saarthiIndex]}
                   </motion.p>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-300/80">
+                    After each mission, Saarthi will share a special message
+                    just for you.
+                  </p>
                 </div>
               </div>
             </motion.div>
 
+            {/* Microdrills card */}
             <DashboardCard
               title="Microdrill Lab"
               subtitle="Fix tricky sounds with tiny focused games."
@@ -291,68 +430,86 @@ export default function Dashboard() {
               gradient="from-emerald-400/20 via-teal-400/10 to-transparent"
               icon="🧩"
             />
-
-            
           </div>
         </div>
 
-        {/* Footer */}
+        {/* === SETTINGS PANEL (Cosmic Drawer) === */}
+        {settingsOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex justify-end"
+            onClick={() => setSettingsOpen(false)} // close when clicking outside
+          >
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 140, damping: 20 }}
+              className="w-80 sm:w-96 h-full bg-black/60 border-l border-white/10 backdrop-blur-xl px-6 py-8 flex flex-col shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+            >
+              <h2 className="text-2xl font-extrabold text-white mb-4 drop-shadow">
+                Parent Settings
+              </h2>
+
+              {/* Edit Profile */}
+              <div className="mb-6">
+                <p className="text-sm uppercase tracking-widest text-slate-300/80 mb-2">
+                  Edit Child Details
+                </p>
+
+                <button
+                  onClick={() => (window.location.href = "/edit-profile")}
+                  className="w-full text-left px-4 py-3 rounded-xl bg-black/30 border border-white/10 hover:bg-white/10 transition backdrop-blur-md text-white shadow"
+                >
+                  Edit Profile
+                </button>
+              </div>
+
+              {/* Analytics / Progress */}
+              <div className="mb-6">
+                <p className="text-sm uppercase tracking-widest text-slate-300/80 mb-2">
+                  Progress & Analytics
+                </p>
+
+                <button
+                  onClick={() => (window.location.href = "/progress")}
+                  className="w-full text-left px-4 py-3 rounded-xl bg-black/30 border border-white/10 hover:bg-white/10 transition backdrop-blur-md text-white shadow"
+                >
+                  View Progress
+                </button>
+
+                <p className="text-xs text-slate-300/70 mt-2">
+                  (Coming soon: reading accuracy charts, phoneme mastery, ASR
+                  insights)
+                </p>
+              </div>
+
+              {/* Logout */}
+              <div className="mt-auto">
+                <button
+                  onClick={() => (window.location.href = "/")}
+                  className="w-full text-left px-4 py-3 rounded-xl bg-red-500/20 border border-red-400/40 text-red-100 font-semibold hover:bg-red-500/30 transition shadow"
+                >
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Bottom tagline */}
         <div className="mt-4 mb-6 text-center text-xs sm:text-sm text-slate-300/70">
           One more page, one more star in your sky ⭐ Keep going, {userName}.
         </div>
       </div>
-
-      {/* Settings Panel */}
-      {settingsOpen && (
-        <div
-          className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex justify-end"
-          onClick={() => setSettingsOpen(false)}
-        >
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 140, damping: 20 }}
-            className="w-80 sm:w-96 h-full bg-black/60 border-l border-white/10 backdrop-blur-xl px-6 py-8 flex flex-col shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-extrabold text-white mb-4 drop-shadow">
-              Parent Settings
-            </h2>
-
-            <button
-              onClick={() => (window.location.href = "/edit-profile")}
-              className="w-full text-left px-4 py-3 rounded-xl bg-black/30 border border-white/10 hover:bg-white/10 transition backdrop-blur-md text-white shadow mb-4"
-            >
-              Edit Profile
-            </button>
-
-            <button
-              onClick={() => (window.location.href = "/progress")}
-              className="w-full text-left px-4 py-3 rounded-xl bg-black/30 border border-white/10 hover:bg-white/10 transition backdrop-blur-md text-white shadow"
-            >
-              View Progress
-            </button>
-
-            <div className="mt-auto">
-              <button
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.href = "/";
-                }}
-                className="w-full text-left px-4 py-3 rounded-xl bg-red-500/20 border border-red-400/40 text-red-100 font-semibold hover:bg-red-500/30 transition shadow mt-4"
-              >
-                Logout
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   );
 }
 
-/* --- Helper Components --- */
+/* --- Small helper components INSIDE THE SAME FILE (still "single page") --- */
 
 function StatCard({ label, value, accent }) {
   return (

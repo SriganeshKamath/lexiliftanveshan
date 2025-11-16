@@ -331,7 +331,7 @@ export default function Signup() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">Create a child account</h1>
-              <p className="text-sm text-slate-200/80 mt-1 max-w-md">Parent-assisted signup — safe, private and playful. Saarthi will cheer every step.</p>
+              <p className="text-sm text-slate-200/80 mt-1 max-w-md">Parent-assisted signup. Saarthi will cheer every step.</p>
             </div>
 
             <div className="ml-3">

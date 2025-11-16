@@ -61,10 +61,12 @@ export default function Login() {
           })
         );
 
+        localStorage.setItem("lexilift_user_id", user._id || user.id);
+
         setSuccess(true);
 
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          window.location.href = "/assessment";
         }, 1200);
       } else {
         setErrorMsg("Login failed. Try again.");
@@ -169,14 +171,6 @@ export default function Login() {
                 Log in to continue your journey
               </p>
             </div>
-
-            <motion.div
-              className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-lg shadow-lg grid place-items-center text-2xl"
-              animate={{ y: [0, -2, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
-              👋
-            </motion.div>
           </div>
 
           {/* Form */}
