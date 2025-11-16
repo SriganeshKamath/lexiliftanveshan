@@ -138,7 +138,7 @@ export default function Dashboard() {
       {/* Background audio – add your own file to public/audio/ambient.mp3 */}
       <audio
         ref={audioRef}
-        src="/audio/ambient-space.mpeg"
+        src="/audio/ambient-space.mp3"
         loop
         preload="auto"
       />
@@ -261,16 +261,7 @@ export default function Dashboard() {
               <span>{musicOn ? "Pause calm music" : "Play calm music"}</span>
             </motion.button>
 
-            {/* Settings Button */}
-            <motion.button
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.03 }}
-              onClick={() => setSettingsOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 border border-white/15 backdrop-blur-sm text-sm sm:text-base shadow-lg"
-            >
-              <span className="text-lg">⚙️</span>
-              <span>Settings</span>
-            </motion.button>
+            
           </div>
         </div>
 
